@@ -1,0 +1,49 @@
+DECLARE
+    l_email    VARCHAR2(255);
+    l_contact  VARCHAR2(255);
+    l_name     VARCHAR2(255);
+    l_cnic     VARCHAR2(255);
+    l_price    VARCHAR2(255);
+    l_mail_id  NUMBER;
+BEGIN
+    -- Assign values from page items
+    l_email   := :P11_EMAIL;
+    l_contact := :P11_CUSTOMER_CONTACT;
+    l_name    := :P11_CUSTOMER_NAME;
+    l_cnic    := :P11_CUSTOMER_CNIC;
+    l_price   := :P11_SALE_PRICE;
+
+    -- Only send email if recipient is provided
+    IF l_email IS NOT NULL THEN
+        l_mail_id := APEX_MAIL.SEND(
+            p_to   => l_email,
+            p_from => 'abcd@gmail.com', -- replace with your APEX mail sender
+            p_subj => 'Thank you for shopping at My Store',
+            p_body => 'Dear ' || l_name || ',' || CHR(10) ||
+                      'Thank you for your purchase at My Store.' || CHR(10) ||
+                      'Sale Price: ' || l_price || CHR(10) ||
+                      'CNIC: ' || l_cnic || CHR(10) ||
+                      'Contact: ' || l_contact || CHR(10) ||
+                      'We hope to see you again!' || CHR(10) ||
+                      'ABCD Team',
+            p_body_html => 
+                '<html><body style="font-family: Arial, sans-serif; color: #333;">' ||
+                '<div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.05);">' ||
+                '<h2 style="color: #1a73e8; text-align: center;">Thank you for your purchase!</h2>' ||
+                '<p>Dear <strong>' || l_name || '</strong>,</p>' ||
+                '<p>We truly appreciate your business at <strong>iPhone Villa</strong>.</p>' ||
+                '<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">' ||
+                '<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">Customer Name:</td><td>' || l_name || '</td></tr>' ||
+                '<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">Contact Number:</td><td>' || l_contact || '</td></tr>' ||
+                '<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">CNIC:</td><td>' || l_cnic || '</td></tr>' ||
+                '<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">Sale Price:</td><td><strong>Rs. ' || l_price || '</strong></td></tr>' ||
+                '</table>' ||
+                '<p style="margin-top: 20px;">We hope to see you again soon!</p>' ||
+                '<p style="color: #888;">iPhone Villa Team</p>' ||
+                '</div></body></html>'
+        );
+        COMMIT;
+    ELSE
+        raise_application_error(-20001, 'Recipient email address is missing.');
+    END IF;
+END;
