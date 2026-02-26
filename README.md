@@ -1,1 +1,1 @@
-how to Sent Email from oracle apex.
+how to Send Email from oracle apex.
